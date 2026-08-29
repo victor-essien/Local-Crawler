@@ -1,9 +1,17 @@
 import { EventEmitter } from "node:events";
 import { BrowserManager } from "./BrowserManager";
-import { PageRenderer, NavigationError, NavigationTimeoutError } from "./PageRenderer";
+import {
+  PageRenderer,
+  NavigationError,
+  NavigationTimeoutError,
+} from "./PageRenderer";
 import { RouteManager } from "./RouteManager";
 import { ContentExtractor } from "../extractor/ContentExtractor";
-import { CrawlerOptions, ResolvedCrawlerOptions, resolveCrawlerOptions } from "../config/types";
+import {
+  CrawlerOptions,
+  ResolvedCrawlerOptions,
+  resolveCrawlerOptions,
+} from "../config/types";
 import { PageResult } from "../types/PageResult";
 import { CrawlResult } from "../types/CrawlResult";
 
@@ -59,7 +67,7 @@ export class LocalCrawler extends EventEmitter {
     const start = Date.now();
     const pages: PageResult[] = [];
     console.log(`Starting crawl of ${routes.length},  routes...`);
-    console.log(routes)
+    console.log(routes);
 
     await this.browserManager.launch();
     try {
@@ -98,8 +106,16 @@ export class LocalCrawler extends EventEmitter {
     try {
       page = await this.browserManager.createPage();
     } catch (err) {
-      const result = this.buildErrorResult(route, url, start, this.describeConnectionError(err));
-      this.emit("page:error", { route, error: result.error } satisfies PageErrorEvent);
+      const result = this.buildErrorResult(
+        route,
+        url,
+        start,
+        this.describeConnectionError(err),
+      );
+      this.emit("page:error", {
+        route,
+        error: result.error,
+      } satisfies PageErrorEvent);
       return result;
     }
 
@@ -115,7 +131,10 @@ export class LocalCrawler extends EventEmitter {
           message: `Route "${route}" returned HTTP ${rendered.httpStatus}.`,
           code: "HTTP_ERROR",
         });
-        this.emit("page:error", { route, error: result.error } satisfies PageErrorEvent);
+        this.emit("page:error", {
+          route,
+          error: result.error,
+        } satisfies PageErrorEvent);
         return result;
       }
 
@@ -128,20 +147,30 @@ export class LocalCrawler extends EventEmitter {
           message: `The page loaded successfully but content extraction failed: ${message}`,
           code: "EXTRACTION_FAILED",
         });
-        this.emit("page:error", { route, error: result.error } satisfies PageErrorEvent);
+        this.emit("page:error", {
+          route,
+          error: result.error,
+        } satisfies PageErrorEvent);
         return result;
       }
 
       let content;
       try {
-        content = this.extractor.extract({ html, pageUrl: rendered.url, options: this.options.extraction });
+        content = this.extractor.extract({
+          html,
+          pageUrl: rendered.url,
+          options: this.options.extraction,
+        });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         const result = this.buildErrorResult(route, url, start, {
           message: `The page loaded successfully but content extraction failed: ${message}`,
           code: "EXTRACTION_FAILED",
         });
-        this.emit("page:error", { route, error: result.error } satisfies PageErrorEvent);
+        this.emit("page:error", {
+          route,
+          error: result.error,
+        } satisfies PageErrorEvent);
         return result;
       }
 
@@ -151,6 +180,7 @@ export class LocalCrawler extends EventEmitter {
         status: "success",
         title: content.title,
         description: content.description,
+        blocks: content.blocks,
         headings: content.headings,
         paragraphs: content.paragraphs,
         links: content.links,
@@ -163,25 +193,37 @@ export class LocalCrawler extends EventEmitter {
     } catch (err) {
       const errorInfo = this.describeRenderError(err, route);
       const result = this.buildErrorResult(route, url, start, errorInfo);
-      this.emit("page:error", { route, error: result.error } satisfies PageErrorEvent);
+      this.emit("page:error", {
+        route,
+        error: result.error,
+      } satisfies PageErrorEvent);
       return result;
     } finally {
       await this.browserManager.releasePage(page);
     }
   }
 
-  private describeRenderError(err: unknown, route: string): { message: string; code?: string } {
+  private describeRenderError(
+    err: unknown,
+    route: string,
+  ): { message: string; code?: string } {
     if (err instanceof NavigationTimeoutError) {
       return { message: err.message, code: err.code };
     }
     if (err instanceof NavigationError) {
-      return { message: this.describeConnectionError(err).message, code: err.code };
+      return {
+        message: this.describeConnectionError(err).message,
+        code: err.code,
+      };
     }
     const message = err instanceof Error ? err.message : String(err);
     return { message: `Failed to crawl route "${route}": ${message}` };
   }
 
-  private describeConnectionError(err: unknown): { message: string; code?: string } {
+  private describeConnectionError(err: unknown): {
+    message: string;
+    code?: string;
+  } {
     const message = err instanceof Error ? err.message : String(err);
     if (/ECONNREFUSED|net::ERR_CONNECTION_REFUSED/i.test(message)) {
       return {
@@ -196,7 +238,7 @@ export class LocalCrawler extends EventEmitter {
     route: string,
     url: string,
     start: number,
-    error: { message: string; code?: string }
+    error: { message: string; code?: string },
   ): PageResult {
     return {
       route,
@@ -204,6 +246,7 @@ export class LocalCrawler extends EventEmitter {
       status: "error",
       title: null,
       description: null,
+      blocks: [],
       headings: [],
       paragraphs: [],
       links: [],

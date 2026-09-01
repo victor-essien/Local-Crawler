@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { RouteManager, InvalidBaseUrlError, NonLocalUrlError } from "../../src/crawler/RouteManager";
+import {
+  RouteManager,
+  InvalidBaseUrlError,
+  NonLocalUrlError,
+} from "../../src/extraction-module/crawler/RouteManager";
 
 describe("RouteManager", () => {
   it("resolves routes against a base URL without trailing-slash bugs", () => {
@@ -34,17 +38,21 @@ describe("RouteManager", () => {
   });
 
   it("rejects a non-http(s) protocol", () => {
-    expect(() => new RouteManager("ftp://localhost:5173")).toThrow(InvalidBaseUrlError);
+    expect(() => new RouteManager("ftp://localhost:5173")).toThrow(
+      InvalidBaseUrlError,
+    );
   });
 
   it("rejects a non-local base URL by default", () => {
-    expect(() => new RouteManager("https://example.com")).toThrow(NonLocalUrlError);
+    expect(() => new RouteManager("https://example.com")).toThrow(
+      NonLocalUrlError,
+    );
   });
 
   it("resolves a relative href against the current page URL", () => {
     const rm = new RouteManager("http://localhost:5173");
     expect(rm.resolveHref("/pricing", "http://localhost:5173/about")).toBe(
-      "http://localhost:5173/pricing"
+      "http://localhost:5173/pricing",
     );
     expect(rm.resolveHref("http://", "http://localhost:5173/about")).toBeNull();
   });

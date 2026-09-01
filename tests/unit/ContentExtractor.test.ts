@@ -1,12 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { ContentExtractor } from "../../src/extractor/ContentExtractor";
-import { resolveCrawlerOptions } from "../../src/config/types";
+import { ContentExtractor } from "../../src/extraction-module/extractor/ContentExtractor";
+import { resolveCrawlerOptions } from "../../src/extraction-module/config/types";
 
 const extractor = new ContentExtractor();
-const defaultExtractionOptions = resolveCrawlerOptions({ baseUrl: "http://localhost:5173" })
-  .extraction;
+const defaultExtractionOptions = resolveCrawlerOptions({
+  baseUrl: "http://localhost:5173",
+}).extraction;
 
-function extract(html: string, pageUrl = "http://localhost:5173/pricing", options = defaultExtractionOptions) {
+function extract(
+  html: string,
+  pageUrl = "http://localhost:5173/pricing",
+  options = defaultExtractionOptions,
+) {
   return extractor.extract({ html, pageUrl, options });
 }
 
@@ -212,7 +217,9 @@ describe("ContentExtractor — links", () => {
       <a href="/pricing">View pricing</a>
     </main></body></html>`;
     const result = extract(html, "http://localhost:5173/");
-    expect(result.links).toEqual([{ text: "View pricing", href: "http://localhost:5173/pricing" }]);
+    expect(result.links).toEqual([
+      { text: "View pricing", href: "http://localhost:5173/pricing" },
+    ]);
   });
 
   it("excludes links with empty text and in-page anchors", () => {
@@ -222,7 +229,9 @@ describe("ContentExtractor — links", () => {
       <a href="/about">About</a>
     </main></body></html>`;
     const result = extract(html);
-    expect(result.links).toEqual([{ text: "About", href: "http://localhost:5173/about" }]);
+    expect(result.links).toEqual([
+      { text: "About", href: "http://localhost:5173/about" },
+    ]);
   });
 
   it("can be disabled via includeLinks: false", () => {
@@ -244,7 +253,7 @@ describe("ContentExtractor — content field", () => {
     </main></body></html>`;
     const result = extract(html);
     expect(result.content).toBe(
-      "Simple pricing\n\nChoose your plan\n\nStart building for free."
+      "Simple pricing\n\nChoose your plan\n\nStart building for free.",
     );
   });
 

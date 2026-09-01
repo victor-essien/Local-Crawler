@@ -4,11 +4,13 @@ import {
   normalizeText,
   dedupePreserveOrder,
   buildNormalizedContent,
-} from "../../src/extractor/ContentNormalizer";
+} from "../../src/extraction-module/extractor/ContentNormalizer";
 
 describe("normalizeWhitespace", () => {
   it("collapses newlines and repeated spaces", () => {
-    expect(normalizeWhitespace("Build\n  better\n\tproducts.")).toBe("Build better products.");
+    expect(normalizeWhitespace("Build\n  better\n\tproducts.")).toBe(
+      "Build better products.",
+    );
   });
 
   it("trims leading and trailing whitespace", () => {
@@ -28,18 +30,35 @@ describe("normalizeText", () => {
 
 describe("dedupePreserveOrder", () => {
   it("removes exact duplicates while preserving order", () => {
-    expect(dedupePreserveOrder(["a", "b", "a", "c", "b"])).toEqual(["a", "b", "c"]);
+    expect(dedupePreserveOrder(["a", "b", "a", "c", "b"])).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
   });
 });
 
 describe("buildNormalizedContent", () => {
   it("joins blocks with blank lines and drops empty ones", () => {
-    const result = buildNormalizedContent(["Simple pricing", "", "  Choose the plan  ", "\n"]);
+    const result = buildNormalizedContent([
+      "Simple pricing",
+      "",
+      "  Choose the plan  ",
+      "\n",
+    ]);
     expect(result).toBe("Simple pricing\n\nChoose the plan");
   });
 
   it("never collapses everything into one line", () => {
-    const result = buildNormalizedContent(["Heading", "Paragraph one.", "Paragraph two."]);
-    expect(result.split("\n\n")).toEqual(["Heading", "Paragraph one.", "Paragraph two."]);
+    const result = buildNormalizedContent([
+      "Heading",
+      "Paragraph one.",
+      "Paragraph two.",
+    ]);
+    expect(result.split("\n\n")).toEqual([
+      "Heading",
+      "Paragraph one.",
+      "Paragraph two.",
+    ]);
   });
 });

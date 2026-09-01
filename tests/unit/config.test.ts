@@ -1,9 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { resolveCrawlerOptions, DEFAULT_TIMEOUT, DEFAULT_WAIT_UNTIL } from "../../src/config/types";
+import {
+  resolveCrawlerOptions,
+  DEFAULT_TIMEOUT,
+  DEFAULT_WAIT_UNTIL,
+} from "../../src/extraction-module/config/types";
 
 describe("resolveCrawlerOptions", () => {
   it("applies sensible defaults when only baseUrl is given", () => {
-    const resolved = resolveCrawlerOptions({ baseUrl: "http://localhost:5173" });
+    const resolved = resolveCrawlerOptions({
+      baseUrl: "http://localhost:5173",
+    });
     expect(resolved.timeout).toBe(DEFAULT_TIMEOUT);
     expect(resolved.waitUntil).toBe(DEFAULT_WAIT_UNTIL);
     expect(resolved.extraction.includeLinks).toBe(true);
@@ -34,11 +40,13 @@ describe("resolveCrawlerOptions", () => {
   it("rejects unknown top-level options", () => {
     expect(() =>
       // @ts-expect-error intentionally passing an unknown option
-      resolveCrawlerOptions({ baseUrl: "http://localhost:5173", bogus: true })
+      resolveCrawlerOptions({ baseUrl: "http://localhost:5173", bogus: true }),
     ).toThrow();
   });
 
   it("rejects a negative timeout", () => {
-    expect(() => resolveCrawlerOptions({ baseUrl: "http://localhost:5173", timeout: -1 })).toThrow();
+    expect(() =>
+      resolveCrawlerOptions({ baseUrl: "http://localhost:5173", timeout: -1 }),
+    ).toThrow();
   });
 });

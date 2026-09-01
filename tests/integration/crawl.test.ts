@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { Server } from "node:http";
-import { LocalCrawler } from "../../src/crawler/LocalCrawler";
+import { LocalCrawler } from "../../src/extraction-module/crawler/LocalCrawler";
 
 const PORT = 4174;
 const BASE_URL = `http://localhost:${PORT}`;
@@ -42,7 +42,9 @@ describe("LocalCrawler — static pages", () => {
       { level: 2, text: "Choose your plan" },
     ]);
     expect(result.paragraphs).toEqual(["Start building for free."]);
-    expect(result.links).toEqual([{ text: "Get started", href: `${BASE_URL}/signup` }]);
+    expect(result.links).toEqual([
+      { text: "Get started", href: `${BASE_URL}/signup` },
+    ]);
     expect(result.content).toContain("Simple pricing");
     expect(result.timing.durationMs).toBeGreaterThanOrEqual(0);
   });
@@ -55,7 +57,9 @@ describe("LocalCrawler — static pages", () => {
     expect(result.content).not.toContain("explicitly marked as ignored");
     expect(result.content).not.toContain("hidden and must be excluded");
     expect(result.content).not.toContain("Footer link");
-    expect(result.paragraphs).toContain("Second visible paragraph on the homepage.");
+    expect(result.paragraphs).toContain(
+      "Second visible paragraph on the homepage.",
+    );
   });
 
   it("falls back to <article> when there's no data-site-content marker", async () => {
@@ -78,7 +82,9 @@ describe("LocalCrawler — client-rendered pages", () => {
     const result = await crawler.crawlPage("/dynamic");
 
     expect(result.status).toBe("success");
-    expect(result.headings).toEqual([{ level: 1, text: "Dynamically rendered heading" }]);
+    expect(result.headings).toEqual([
+      { level: 1, text: "Dynamically rendered heading" },
+    ]);
     expect(result.content).toContain("injected client-side after a delay");
   });
 });
@@ -91,7 +97,11 @@ describe("LocalCrawler — multi-route crawl", () => {
     expect(result.total).toBe(3);
     expect(result.successful).toBe(3);
     expect(result.failed).toBe(0);
-    expect(result.pages.map((p) => p.route)).toEqual(["/", "/pricing", "/about"]);
+    expect(result.pages.map((p) => p.route)).toEqual([
+      "/",
+      "/pricing",
+      "/about",
+    ]);
   });
 
   it("does not let one failing route crash the whole crawl", async () => {
@@ -110,7 +120,10 @@ describe("LocalCrawler — multi-route crawl", () => {
 
 describe("LocalCrawler — error handling", () => {
   it("reports a clean error when the dev server is unavailable", async () => {
-    const crawler = new LocalCrawler({ baseUrl: "http://localhost:59999", timeout: 3000 });
+    const crawler = new LocalCrawler({
+      baseUrl: "http://localhost:59999",
+      timeout: 3000,
+    });
     const result = await crawler.crawlPage("/");
 
     expect(result.status).toBe("error");

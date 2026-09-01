@@ -34,7 +34,11 @@ export interface RenderOptions {
  * would allow an alternate renderer later without touching extraction.
  */
 export class PageRenderer {
-  async render(page: Page, url: string, options: RenderOptions): Promise<RenderResult> {
+  async render(
+    page: Page,
+    url: string,
+    options: RenderOptions,
+  ): Promise<RenderResult> {
     const start = Date.now();
 
     let httpStatus: number | null = null;
@@ -48,7 +52,7 @@ export class PageRenderer {
       const message = err instanceof Error ? err.message : String(err);
       if (/timeout/i.test(message)) {
         throw new NavigationTimeoutError(
-          `Navigation to "${url}" exceeded the configured timeout of ${options.timeout}ms.`
+          `Navigation to "${url}" exceeded the configured timeout of ${options.timeout}ms.`,
         );
       }
       throw new NavigationError(`Unable to navigate to "${url}": ${message}`);
@@ -66,7 +70,7 @@ export class PageRenderer {
         const message = err instanceof Error ? err.message : String(err);
         throw new NavigationTimeoutError(
           `Waited for selector "${options.waitForSelector}" on "${url}" but it never appeared ` +
-            `within ${options.timeout}ms: ${message}`
+            `within ${options.timeout}ms: ${message}`,
         );
       }
     }

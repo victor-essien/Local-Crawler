@@ -3,24 +3,33 @@
   "version": "0.1.0",
   "description": "Core local website content extraction engine (developer-owned, local dev servers only)",
   "main": "index.js",
-  
-  
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "test-app": "tsx test-app/server.ts",
     "test-crawler": "tsx test-app/crawler-test.ts"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@types/pg": "^8.23.1",
     "cheerio": "^1.0.0",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "openai": "^7.9.0",
+    "pg": "^8.23.0",
     "playwright": "^1.47.0",
+    "postgres": "^3.4.9",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.23.12",
     "typescript": "^5.5.4",
     "vitest": "^4.1.10"
